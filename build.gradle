@@ -30,7 +30,7 @@ plugins {
 
 // only include in top level project
 // apply plugin: 'org.standardout.bnd-platform'
-apply plugin: 'org.akhikhl.wuff.eclipse-repository'
+// apply plugin: 'org.akhikhl.wuff.eclipse-repository'
 apply plugin: 'ch.netzwerg.release'
 
 
@@ -53,11 +53,17 @@ allprojects {
     	compression = Compression.GZIP
     	extension = 'tar.gz'
 	}
+	
+	// disable javadoc errors
+	tasks.withType(Javadoc) {
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
 }
 
 // configure all java projects
 configure(subprojects.findAll {it.name != 'distribution'}) {
 	apply plugin: 'java'
+	apply plugin: 'maven'
 	apply plugin: 'maven-publish'
 
 	clean {
@@ -108,6 +114,11 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 	task sourceJar(type: Jar) {
  	   from sourceSets.main.allJava
 	}
+	
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	}
 
 	jar {
     	manifest {
@@ -130,11 +141,31 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 						+ "-" + jar.manifest.getEffectiveManifest().getAttributes().get("Bundle-Version") \
 						+ ".jar"
 
+	javadoc {
+		source = sourceSets.main.allJava
+		classpath = configurations.compileClasspath
+	  
+		options
+		{
+		  setMemberLevel JavadocMemberLevel.PUBLIC
+		  setAuthor true
+	  
+		  links "https://docs.oracle.com/javase/5/docs/api/"
+		}
+	}
+						  
 	repositories {
 		mavenCentral()
    	}
 
 	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+//				from components.java
+//				artifact sourceJar
+				artifact javadocJar
+			}
+		}
 		repositories {
 	        maven {
 	        // TODO remove completely
@@ -149,7 +180,8 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
           		}
 	        	// println ("url=" + url)
         	}
-    	}
+  	
+		}
 	}
 }
 
@@ -190,6 +222,9 @@ project(':org.eclipse.concierge.tests.integration') {
     }
 }
 
+
+
+
 // release management
 release {
   dependsOn distZip // 'distZip' could e.g be used in combination with the 'application' plugin
@@ -202,7 +237,7 @@ release {
 
 // task to create a gradle wrapper with used gradle version
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+    gradleVersion = '4.10.2'
     jarFile = '.gradle-wrapper/gradle-wrapper.jar'
 }
 
