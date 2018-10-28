@@ -5,3 +5,4 @@
 /build/
 distribution/publish-maven-v5\.0\.0/concierge-incubation-5\.0\.0\.tar\.gz
 distribution/publish-maven-v5\.0\.0/publish/
+distribution/publish-maven-v5\.0\.0/signed/
