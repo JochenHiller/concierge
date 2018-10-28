@@ -13,10 +13,38 @@ if [ "$1" == "clean" ] ; then
   rm -f $CONCIERGE_ARCHIVE
   rm -rf ./dist
   rm -rf ./publish
+  rm -rf ./signed
   # cleanup also local m2 repo for the generated artifacts
   rm -rf ~/.m2/repository/org/eclipse/concierge/*
   exit 1
 fi
+
+if [ "$1" == "sign" ] ; then
+  # now sign jars. We do that just to check that if can be done
+  # we actually do NOT publish the artifacts
+  # this step will ONYL be done when running on CI server
+  # the size of signed JAR file is about 30 kB bigger, due to certs and extended MANIFEST
+
+  # we assume all artifacts to be published are in ./publish
+  if [ ! -d signed ] ; then mkdir -p signed ; fi
+
+  for b in \
+	org.eclipse.concierge \
+	org.eclipse.concierge.extension.permission \
+	org.eclipse.concierge.service.packageadmin \
+	org.eclipse.concierge.service.permission \
+	org.eclipse.concierge.service.startlevel \
+	org.eclipse.concierge.service.xmlparser \
+	org.eclipse.concierge.shell \
+    ; do
+    # JAR FILES: Submit unsigned-jar.jar and save signed output to signedfile.jar
+    curl -o signed/$b-$RELEASE-signed.jar \
+         -F file=@publish/$b/$RELEASE/$b-$RELEASE.jar http://build.eclipse.org:31338/sign
+  done
+
+  exit 0
+fi
+
 
 # download dist 5.0.0 to use well known artifacts
 (
@@ -81,5 +109,6 @@ done
 # cleanup not needed data anymore
 rm -rf ./dist
 )
+
 
 exit 0
