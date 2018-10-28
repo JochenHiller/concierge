@@ -14,20 +14,21 @@ if [ "$1" == "clean" ] ; then
   rm -rf ./dist
   rm -rf ./publish
   rm -rf ./signed
+  rm -rf ./maven-central-upload
   # cleanup also local m2 repo for the generated artifacts
   rm -rf ~/.m2/repository/org/eclipse/concierge/*
-  exit 1
+  exit 0
 fi
 
 if [ "$1" == "sign" ] ; then
-  # now sign jars. We do that just to check that if can be done
+  # now sign jars. We do that just to check that IF and HOW it can be done
   # we actually do NOT publish the artifacts
-  # this step will ONYL be done when running on CI server
-  # the size of signed JAR file is about 30 kB bigger, due to certs and extended MANIFEST
+  # the size of signed JAR file is about 6-30 kB bigger, due to key and signed classes
 
   # we assume all artifacts to be published are in ./publish
   if [ ! -d signed ] ; then mkdir -p signed ; fi
 
+  # for all bundles
   for b in \
 	org.eclipse.concierge \
 	org.eclipse.concierge.extension.permission \
@@ -40,6 +41,7 @@ if [ "$1" == "sign" ] ; then
     # we copy jar file as unsiged jar file to compare easily
     cp publish/$b/$RELEASE/$b-$RELEASE.jar signed/$b-$RELEASE-unsigned.jar 
     # JAR FILES: Submit unsigned-jar.jar and save signed output to signedfile.jar
+    # this step will ONLY work when running on CI server
     curl -o signed/$b-$RELEASE-signed.jar \
          -F file=@publish/$b/$RELEASE/$b-$RELEASE.jar http://build.eclipse.org:31338/sign
   done
@@ -47,6 +49,8 @@ if [ "$1" == "sign" ] ; then
   exit 0
 fi
 
+
+if [ "$1" == "build" ] ; then
 
 # download dist 5.0.0 to use well known artifacts
 (
@@ -64,10 +68,15 @@ cd ..
 
 # build again the code from release tag
 (
+
 (
 cd ../..
 # rebuild, tests not needed as release yet done
 ./gradlew clean build -x test publishMavenJavaPublicationToMavenLocal
+# if [ "$?" != 0 ] ; then
+  # stop on failures
+#  exit 1
+#fi
 )
 if [ ! -d publish ] ; then mkdir -p publish ; fi
 cd publish
@@ -78,6 +87,7 @@ cd ..
 # do not publish the nodebug version
 rm -rf dist/concierge-incubation-$RELEASE/framework/*nodebug*
 
+set -x
 
 # copy artifacts from release distribution to publish
 # fix lastest update to the timestamp of distribution
@@ -112,5 +122,9 @@ done
 rm -rf ./dist
 )
 
-
+# end of build command
 exit 0
+fi
+
+echo "Usage: ./Concierge-Release.sh {clean | build | sign}"
+exit 1

@@ -112,7 +112,8 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 	}
 
 	task sourceJar(type: Jar) {
- 	   from sourceSets.main.allJava
+		classifier = 'sources'
+ 	   	from sourceSets.main.allJava
 	}
 	
 	task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -161,9 +162,41 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 	publishing {
 		publications {
 			mavenJava(MavenPublication) {
-//				from components.java
-//				artifact sourceJar
-				artifact javadocJar
+				artifact sourceJar {
+					classifier "sources"
+				}
+				artifact javadocJar {
+					classifier "javadoc"
+				}
+
+				pom {
+					packaging = 'bundle'
+					description = 'Eclipse Concierge is a small-footprint implementation of the OSGi Core Specification R5 standard optimized for mobile and embedded devices.'
+					url = 'https://www.eclipse.org/concierge/'
+					licenses {
+						license {
+							name = 'Eclipse Public License 1.0'
+							url = 'http://www.eclipse.org/legal/epl-v10.html'
+						}
+					}
+					developers {
+						developer {
+							name = 'Jan Rellermeyer'
+						}
+						developer {
+							name = 'Tim Verbelen'
+						}
+						developer {
+							name = 'Jochen Hiller'
+						}
+					}
+					scm {
+						connection = 'scm:git:https://github.com/eclipse/concierge.git'
+						developerConnection = 'scm:git:https://github.com/eclipse/concierge.git'
+						url = 'https://github.com/eclipse/concierge'
+					}
+				}
+	
 			}
 		}
 		repositories {
