@@ -37,6 +37,8 @@ if [ "$1" == "sign" ] ; then
 	org.eclipse.concierge.service.xmlparser \
 	org.eclipse.concierge.shell \
     ; do
+    # we copy jar file as unsiged jar file to compare easily
+    cp publish/$b/$RELEASE/$b-$RELEASE.jar signed/$b-$RELEASE-unsigned.jar 
     # JAR FILES: Submit unsigned-jar.jar and save signed output to signedfile.jar
     curl -o signed/$b-$RELEASE-signed.jar \
          -F file=@publish/$b/$RELEASE/$b-$RELEASE.jar http://build.eclipse.org:31338/sign
