@@ -87,7 +87,7 @@ cd ..
 # do not publish the nodebug version
 rm -rf dist/concierge-incubation-$RELEASE/framework/*nodebug*
 
-set -x
+echo "Setup ./publish folder to create all maven artifacts..."
 
 # copy artifacts from release distribution to publish
 # fix lastest update to the timestamp of distribution
