@@ -204,6 +204,17 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 				def releasesRepoUrl = "https://repo.eclipse.org/content/repositories/concierge-releases/"
 				def snapshotsRepoUrl = "https://repo.eclipse.org/content/repositories/concierge-snapshots/"
 				url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+				credentials {
+					println(${eclipseRepoUsername})
+					println(${eclipseRepoPassword})
+					username eclipseRepoUsername
+					password eclipseRepoPassword
+				}
+				authentication {
+					basic(BasicAuthentication)
+				}
+				
 			}
 	        // TODO remove completely
 	        	// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=467163
