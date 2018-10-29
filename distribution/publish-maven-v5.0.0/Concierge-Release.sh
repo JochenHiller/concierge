@@ -70,13 +70,21 @@ cd ..
 (
 
 (
+# set proxy only in CI server
+GRADLE_PROXY_SETTINGS=""
+if [ "$JENKINS_URL == "https://ci.eclipse.org/concierge/" ] ; then
+  GRADLE_PROXY_SETTINGS=""
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttp.proxyHost=proxy.eclipse.org"
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttp.proxyPort=9898"
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttp.nonProxyHosts=*.eclipse.org"
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttps.proxyHost=proxy.eclipse.org"
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttps.proxyPort=9898"
+  GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttps.nonProxyHosts=*.eclipse.org"
+fi
+
 cd ../..
 # rebuild, tests not needed as release yet done
-./gradlew clean build -x test publishMavenJavaPublicationToMavenLocal
-# if [ "$?" != 0 ] ; then
-  # stop on failures
-#  exit 1
-#fi
+./gradlew $GRADLE_PROXY_SETTINGS clean build -x test publishMavenJavaPublicationToMavenLocal
 )
 if [ ! -d publish ] ; then mkdir -p publish ; fi
 cd publish
