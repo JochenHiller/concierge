@@ -72,7 +72,7 @@ cd ..
 (
 # set proxy only in CI server
 GRADLE_PROXY_SETTINGS=""
-if [ "$JENKINS_URL == "https://ci.eclipse.org/concierge/" ] ; then
+if [ "$JENKINS_URL" == "https://ci.eclipse.org/concierge/" ] ; then
   GRADLE_PROXY_SETTINGS=""
   GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttp.proxyHost=proxy.eclipse.org"
   GRADLE_PROXY_SETTINGS="$GRADLE_PROXY_SETTINGS -Dhttp.proxyPort=9898"
