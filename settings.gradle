@@ -6,5 +6,7 @@ include	'org.eclipse.concierge',
 		'org.eclipse.concierge.service.startlevel',
 		'org.eclipse.concierge.service.xmlparser',
 		'org.eclipse.concierge.shell',
-		'org.eclipse.concierge.tests.integration',
 		'distribution'
+
+// removed for 5.0.0 release build
+// 		'org.eclipse.concierge.tests.integration',
