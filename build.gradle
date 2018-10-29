@@ -206,8 +206,6 @@ configure(subprojects.findAll {it.name != 'distribution'}) {
 				url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
 				credentials {
-					println eclipseRepoUsername
-					println eclipseRepoPassword
 					username eclipseRepoUsername
 					password eclipseRepoPassword
 				}
